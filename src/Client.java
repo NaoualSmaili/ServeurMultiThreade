@@ -1,8 +1,9 @@
 import java.util.Random;
+import java.util.concurrent.ArrayBlockingQueue;
 
 public class Client implements Runnable{
     int id;
-    RequeteReponse lr;
+    ArrayBlockingQueue<Requete> lr;
     //int numReq;
     //int model;
 
@@ -11,11 +12,15 @@ public class Client implements Runnable{
 
     static int cpt=1;
     static final Object mutex = new Object();
+    static int nbrClients = 0;
+    Thread server;
 
-    public Client(RequeteReponse lr) {
+    public Client(ArrayBlockingQueue<Requete> lr, Thread server) {
         this.lr = lr;
+        this.server=server;
         synchronized (mutex){
             id=cpt++;
+            nbrClients++;
         }
     }
 
@@ -36,13 +41,26 @@ public class Client implements Runnable{
     public void run() {
         Requete r = new Requete(this, generateur.nextInt(1000));
         System.out.println("send request");
-        lr.insererRequeste(r);
+        System.out.println(lr.toString());
+        //lr.insererRequeste(r);
+        try {
+            lr.put(r);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
         System.out.println("waiting...");
         synchronized (reveil){
             try {
                 reveil.wait();
             } catch (InterruptedException e) {
                 e.printStackTrace();
+            }
+        }
+        synchronized (mutex){
+            nbrClients--;
+            if(nbrClients==0){
+                System.out.println("server must be interrupted");
+                server.interrupt();
             }
         }
         System.out.println("Request processed");

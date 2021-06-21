@@ -1,3 +1,5 @@
+import java.util.concurrent.ArrayBlockingQueue;
+
 public class Test {
     static int nbrRequetes;
     static int nbrClients;
@@ -14,12 +16,15 @@ public class Test {
             return;
         }
 
-        RequeteReponse rr = new RequeteReponse(nbrRequetes);
+        ArrayBlockingQueue<Requete> rr = new ArrayBlockingQueue<Requete>(nbrRequetes, true);
+
+        Thread server = new Thread(new Serveur(rr));
+        server.start();
 
         for (int i= 0; i<nbrClients; i++){
-            new Thread(new Client(rr)).start();
+            new Thread(new Client(rr,server)).start();
         }
 
-        new Thread(new Serveur(rr)).start();
+
     }
 }

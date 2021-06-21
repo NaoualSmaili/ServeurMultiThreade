@@ -1,11 +1,14 @@
+import java.util.concurrent.ArrayBlockingQueue;
+
 public class Serveur implements Runnable{
 
     int ref;
     int numR;
-    RequeteReponse rr;
+    //RequeteReponse rr;
+    ArrayBlockingQueue<Requete> rr;
     int resultat;
 
-    public Serveur(RequeteReponse rr) {
+    public Serveur(ArrayBlockingQueue<Requete> rr) {
         this.rr = rr;
     }
 
@@ -22,8 +25,14 @@ public class Serveur implements Runnable{
     public void run() {
         Requete r;
         while(true){
-            r=rr.extraireRequete();
-            new Thread(new Servant(r)).start();
+            //r=rr.extraireRequete();
+            try {
+                r=rr.take();
+                new Thread(new Servant(r)).start();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+
         }
     }
 }
