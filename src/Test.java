@@ -8,7 +8,6 @@ public class Test {
     }
 
     public static void main(String[] args) {
-
         try{
             nbrRequetes=1;
             nbrClients=5;
@@ -24,7 +23,5 @@ public class Test {
         for (int i= 0; i<nbrClients; i++){
             new Thread(new Client(rr,server)).start();
         }
-
-
     }
 }

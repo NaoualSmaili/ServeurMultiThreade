@@ -1,38 +1,45 @@
+import java.util.Random;
 import java.util.concurrent.ArrayBlockingQueue;
 
-public class Serveur implements Runnable{
-
-    int ref;
-    int numR;
-    //RequeteReponse rr;
+public class Serveur implements Runnable {
     ArrayBlockingQueue<Requete> rr;
-    int resultat;
-
     public Serveur(ArrayBlockingQueue<Requete> rr) {
         this.rr = rr;
     }
 
-    void soumettre(){
-
+    void soumettre(Requete r, ArrayBlockingQueue<Requete> lr) {
+        //System.out.println("Requests list before inserting "+lr.toString());
+        try {
+            lr.put(r);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
     }
-
-    void traiterRequete(){
-
+    void traiterRequete() throws InterruptedException {
+        Requete r;
+        r = rr.take();
+        /*switch (r.num) {
+            case 1: {
+                int time = new Random().nextInt((5000 - 600) + 1) + 600;
+                Thread.sleep(time);
+            }
+            case 2: {
+                while (true) {
+                    Thread.sleep(10000);
+                }
+            }
+        }*/
+        new Thread(new Servant(r)).start();
     }
-
 
     @Override
     public void run() {
-        Requete r;
-        while(true){
-            //r=rr.extraireRequete();
-            try {
-                r=rr.take();
-                new Thread(new Servant(r)).start();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
+        try {
+            while (true) {
+                traiterRequete();
             }
-
+        } catch (InterruptedException e) {
+            System.out.println("Server interrupted");
         }
     }
 }

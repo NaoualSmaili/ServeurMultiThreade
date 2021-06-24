@@ -4,8 +4,6 @@ import java.util.concurrent.ArrayBlockingQueue;
 public class Client implements Runnable{
     int id;
     ArrayBlockingQueue<Requete> lr;
-    //int numReq;
-    //int model;
 
     Random generateur = new Random();
     Object reveil = new Object();
@@ -40,15 +38,16 @@ public class Client implements Runnable{
     @Override
     public void run() {
         Requete r = new Requete(this, generateur.nextInt(1000));
-        System.out.println("send request");
-        System.out.println(lr.toString());
-        //lr.insererRequeste(r);
+        System.out.println(this.toString()+"send request");
+        //System.out.println("Requests list before inserting "+lr.toString());
         try {
             lr.put(r);
+            //System.out.println("Requests list after inserting "+lr.toString());
+
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-        System.out.println("waiting...");
+        System.out.println(this.toString()+"is waiting...");
         synchronized (reveil){
             try {
                 reveil.wait();
@@ -63,6 +62,6 @@ public class Client implements Runnable{
                 server.interrupt();
             }
         }
-        System.out.println("Request processed");
+        System.out.println(r.toString() + "Request processed");
     }
 }

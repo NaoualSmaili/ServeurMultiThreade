@@ -7,13 +7,13 @@ public class Servant implements Runnable{
 
     @Override
     public void run() {
-        System.out.println("Starting...");
+        System.out.println("Servant starting...");
         try {
             Thread.sleep(r.valeur);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-        System.out.println("Warn client");
+        System.out.println("Warn client "+ r.client.toString());
         r.client.requeteServie();
     }
 }
